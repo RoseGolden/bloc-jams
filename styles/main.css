@@ -35,11 +35,10 @@ html {
    margin: 0 auto;
    max-width: 64rem;
  }
-
  /* Medium and small screens (640px) */
  @media (min-width: 640px) {
-   /* Style information will go here */
- }
+   html {font-size: 112%;}
+
  .column {
          float: left;
          padding-left: 1rem;
@@ -55,5 +54,12 @@ html {
 
  /* Large screens (1024px) */
  @media (min-width: 1024px) {
-   /* Style information will go here */
+   html {font-size: 120%;}
+ }
+ .clearfix::after {
+    content: ".";
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
  }
