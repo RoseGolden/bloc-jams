@@ -59,6 +59,11 @@ html {
  .links-container .navbar-link:hover {
      color: rgb(233,50,117);
  }
+ .navbar-link:active{
+   color:rgb(233,50,117);
+   background-color: white;
+ }
+
  .selling-points {
      position: relative;
      display: table;
@@ -73,7 +78,7 @@ html {
  /* Medium and small screens (640px) */
  @media (min-width: 640px) {
    html {font-size: 112%;}
-
+ }
 
  .column {
    {
@@ -94,9 +99,9 @@ html {
    html {font-size: 120%;}
  }
  .clearfix::after {
-   content: ".";
-   visibility: hidden;
-   display: block;
-   height: 0;
-   clear: both;
-}
+    content: ".";
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
+ }
