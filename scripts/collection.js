@@ -1,5 +1,9 @@
 var collectionItemTemplate =
   '<div class = "collection-album-container column fourth">'
+<<<<<<< HEAD
+=======
+
+>>>>>>> 830f88733990b57b36bb8c93865febe4e90c5b3a
 + '     <img src="assets/images/album_covers/01.png"/>'
 + '     <div class="collection-album-info caption">'
 + '      <p>'
@@ -25,3 +29,7 @@ var collectionItemTemplate =
          collectionContainer.innerHTML += collectionItemTemplate;
      }
  };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 830f88733990b57b36bb8c93865febe4e90c5b3a
