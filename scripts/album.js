@@ -51,6 +51,10 @@
  var createSongRow = function(songNumber, songName, songLength) {
      var template =
         '<tr class="album-view-song-item">'
+<<<<<<< HEAD
+=======
+      + '  <td class="song-item-number">' + songNumber + '</td>'
+>>>>>>> df40ce06c19504001adeff9160071307f7727ef2
       + '  <td class="song-item-number" data-song-number="' + songNumber + '">' + songNumber + '</td>'
       + '  <td class="song-item-title">' + songName + '</td>'
       + '  <td class="song-item-duration">' + songLength + '</td>'
@@ -89,6 +93,7 @@
      }
  };
 
+<<<<<<< HEAD
  var clickHandler = function(targetElement) {
 
     var songItem = getSongItem(targetElement);
@@ -150,6 +155,13 @@ var getSongItem = function(element) {
   // Store state of playing songs
 var currentlyPlayingSong = null;
 
+=======
+ var songListContainer = document.getElementsByClassName('album-view-song-list')[0];
+ var songRows = document.getElementsByClassName('album-view-song-item');
+
+ // Album button templates
+  var playButtonTemplate = '<a class="album-song-button"><span class="ion-play"></span></a>';
+>>>>>>> df40ce06c19504001adeff9160071307f7727ef2
 
  window.onload = function() {
      setCurrentAlbum(albumPicasso);
@@ -163,6 +175,7 @@ var currentlyPlayingSong = null;
     });
     for (var i = 0; i < songRows.length; i++) {
          songRows[i].addEventListener('mouseleave', function(event) {
+<<<<<<< HEAD
            // #1
             var songItem = getSongItem(event.target);
             var songItemNumber = songItem.getAttribute('data-song-number');
@@ -176,6 +189,10 @@ var currentlyPlayingSong = null;
          songRows[i].addEventListener('click', function(event) {
            clickHandler(event.target);
 
+=======
+           // Selects first child element, which is the song-item-number element
+          this.children[0].innerHTML = this.children[0].getAttribute('data-song-number');
+>>>>>>> df40ce06c19504001adeff9160071307f7727ef2
          });
      }
 
