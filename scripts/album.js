@@ -116,13 +116,12 @@
  var songRows = document.getElementsByClassName('album-view-song-item');
 
  var findParentByClassName = function(element, targetClass) {
-    if (element) {
-        var currentParent = element.parentElement;
-        while (currentParent.className !== targetClass && currentParent.className !== null) {
-            currentParent = currentParent.parentElement;
-        }
-        return currentParent;
-    }
+       var currentParent = element.parentElement;
+       if (currentParent === null){
+         console.log("No parent found");
+   }else (currentParent !== ("No parent found with that class name")){
+     console.log("class name not found");
+   }
 };
 
 var getSongItem = function(element) {
@@ -155,14 +154,13 @@ var currentlyPlayingSong = null;
      setCurrentAlbum(albumPicasso);
 
      var findParentByClassName = function(element, targetClass) {
-        var currentParent = element.parentElement;
-        if currentParent = null{
-          console.log("No parent found")
+            var currentParent = element.parentElement;
+            if (currentParent === null){
+              console.log("No parent found");
+        }else (currentParent !== ("No parent found with that class name"));{
+          console.log("class name not found");
         }
-    }else currentParent !== "No parent found with that class name"{
-      console.log("class name not found")
-    }
-};
+    };
 
      songListContainer.addEventListener('mouseover', function(event) {
         // #1
