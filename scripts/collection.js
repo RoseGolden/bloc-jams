@@ -17,16 +17,14 @@ var buildCollectionItemTemplate = function() {
     return $(template);
 };
 
-  ;
-
-  window.onload = function() {
-    // #1
-     var collectionContainer = document.getElementsByClassName('album-covers')[0];
-     // #2
-     collectionContainer.innerHTML = '';
-
-     // #3
+  $(window).load(function() {
+    //#3
+     var $collectionContainer = $('.album-covers');
+     // #4
+     $collectionContainer.empty();
      for (var i = 0; i < 12; i++) {
-         collectionContainer.innerHTML += collectionItemTemplate;
+         var $newThumbnail = buildCollectionItemTemplate();
+         //#5
+         $collectionContainer.append($newThumbnail);
      }
- };
+ });
