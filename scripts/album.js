@@ -1,25 +1,30 @@
- // Another Example Album
+
  var setSong = function (songNumber) {
-    // prevent concurrent play back
-    // stop current song before we set a new one
-    if (currentSoundFile) {
+   if (currentSoundFile) {
         currentSoundFile.stop();
     }
+   currentlyPlayingSongNumber = parseInt(songNumber);
+   currentSongFromAlbum = currentAlbum.songs[songNumber - 1];
 
-  var albumYungBae = {
-      title: 'Bae2',
-      artist: 'Yung Bae',
-      label: 'Cubism',
-      year: '2017',
-      albumArtUrl: 'assets/images/album_covers/16.png',
-      songs: [
-          { title: "You're in love", duration: '4:26' },
-          { title: "Don't Stop", duration: '3:14' },
-          { title: 'Slam Jam', duration: '5:01' },
-          { title: 'Come On Girl', duration: '3:21'},
-          { title: 'Blue Skies', duration: '2:15'}
-      ]
-  };
+   // #1
+     currentSoundFile = new buzz.sound(currentSongFromAlbum.audioUrl, {
+         // #2
+         formats: [ 'mp3' ],
+         preload: true
+     });
+     setVolume(currentVolume);
+   };
+   var setVolume = function(volume) {
+    if (currentSoundFile) {
+         currentSoundFile.setVolume(volume);
+     }
+     if (currentSoundFile) {
+         currentSoundFile.stop();
+     }
+ };
+    // prevent concurrent play back
+    // stop current song before we set a new one
+
 
   var getSongNumberCell = function (number) {
     return $('.song-item-number[data-song-number="' + number + '"]');
@@ -39,19 +44,22 @@
          if (currentlyPlayingSongNumber !== songNumber) {
            // Switch from Play -> Pause button to indicate new song is playing.
            setSong(songNumber);
+           currentSoundFile.play();
            $(this).html(pauseButtonTemplate);
            currentlyPlayingSongNumber = songNumber;
            currentSongFromAlbum = currentAlbum.songs[songNumber - 1];
 
            updatePlayerBarSong();
            } else if (currentlyPlayingSongNumber === songNumber) {
-
-           // Switch from Pause -> Play button to pause currently playing song.
-
-           $(this).html(playButtonTemplate);
-           $('.main-controls .play-pause').html(playerBarPlayButton);
-           currentlyPlayingSongNumber = null;
-           currentSongFromAlbum = null;
+             if (currentSoundFile.isPaused()) {
+                   $(this).html(pauseButtonTemplate);
+                   $('.main-controls .play-pause').html(playerBarPauseButton);
+                      currentSoundFile.play();
+                    } else {
+                    $(this).html(playButtonTemplate);
+                    $('.main-controls .play-pause').html(playerBarPlayButton);
+                      currentSoundFile.pause();
+          }
 
          }
     };
@@ -124,6 +132,7 @@
 
     // Set a new current song
     setSong(currentSongIndex + 1);
+    currentSoundFile.play();
     currentlyPlayingSongNumber = parseInt(songNumber);
     currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
 
@@ -151,6 +160,7 @@ var previousSong = function() {
 
     // Set a new current song
     setSong(currentSongIndex + 1);
+    currentSoundFile.play();
     currentlyPlayingSongNumber = currentSongIndex + 1;
     currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
 
@@ -188,6 +198,21 @@ var previousSong = function() {
 
   });
 
+  var togglePlayFromPlayerBar = function () {
+    var currentlyPlayingCell = getSongNumberCell(currentlyPlayingSongNumber);
+
+    if (currentSoundFile.isPaused()) {
+        $(currentlyPlayingCell).html(pauseButtonTemplate);
+        $('.main-controls .play-pause').html(playerBarPauseButton);
+        currentSoundFile.play();
+        updateSeekBarWhileSongPlays();
+    } else {
+        $(currentlyPlayingCell).html(playButtonTemplate);
+        $('.main-controls .play-pause').html(playerBarPlayButton);
+        currentSoundFile.pause();
+    }
+};
+
  // Album button templates
   var playButtonTemplate = '<a class="album-song-button"><span class="ion-play"></span></a>';
   var pauseButtonTemplate = '<a class="album-song-button"><span class="ion-pause"></span></a>';
@@ -198,22 +223,15 @@ var previousSong = function() {
  var currentAlbum = null;
  var currentlyPlayingSongNumber = null;
  var currentSongFromAlbum = null;
+ var currentSoundFile = null;
+ var currentVolume = 80;
  var $previousButton = $('.main-controls .previous');
  var $nextButton = $('.main-controls .next');
 
- $(document).ready(function() {
-     setCurrentAlbum(albumPicasso);
-     $previousButton.click(previousSong);
-     $nextButton.click(nextSong);
-     }
-
-     var albums = [albumPicasso, albumMarconi, albumYungBae];
-     var index = 1;
-     albumImage.addEventListener("click", function(event) {
-        setCurrentAlbum(albums[index]);
-        index++;
-        if (index == albums.length){
-          index = 0;
-        }
- });
+ $(document).ready(function () {
+    setCurrentAlbum(albumPicasso);
+    setupSeekBars();
+    $previousButton.click(previousSong);
+    $nextButton.click(nextSong);
+    $playPauseButton.click(togglePlayFromPlayerBar);
 });
