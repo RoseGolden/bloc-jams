@@ -80,7 +80,7 @@ var setVolume = function(volume) {
        var songNumberCell = $(this).find('.song-item-number');
        var songNumber = songNumberCell.attr('data-song-number');
 
-       if parseInt(songNumber) !== currentlyPlayingSongNumber) {
+       if (parseInt(songNumber) !== currentlyPlayingSongNumber) {
            songNumberCell.html(playButtonTemplate);
      }
      };
