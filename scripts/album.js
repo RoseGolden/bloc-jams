@@ -2,7 +2,7 @@ var seek = function(time) {
      if (currentSoundFile) {
          currentSoundFile.setTime(time);
      }
- }
+ };
 
 var setVolume = function(volume) {
  if (currentSoundFile) {
@@ -28,6 +28,7 @@ var setVolume = function(volume) {
      });
      setVolume(currentVolume);
    };
+
    var setVolume = function(volume) {
      if (currentSoundFile) {
          currentSoundFile.setVolume(volume);
@@ -55,6 +56,7 @@ var createSongRow = function(songNumber, songName, songLength) {
      '  <td class="song-item-title">' + songName + '</td>' +
      '  <td class="song-item-duration">' + filterTimeCode(songLength) + '</td>' +
      '</tr>';
+
      return $(template);
 
  var $row = $(template);
@@ -199,57 +201,19 @@ var createSongRow = function(songNumber, songName, songLength) {
  };
 
 
- var updateSeekPercentage = function($seekBar, seekBarFillRatio) {
-    var offsetXPercent = seekBarFillRatio * 100;
-    // #1
-    offsetXPercent = Math.max(0, offsetXPercent);
-    offsetXPercent = Math.min(100, offsetXPercent);
+ var setupSeekBars = function () {
+    var $seekBars = $('.player-bar .seek-bar');
 
-    // #2
-    var percentageString = offsetXPercent + '%';
-    $seekBar.find('.fill').width(percentageString);
-    $seekBar.find('.thumb').css({left: percentageString});
- };
-
- var setupSeekBars = function() {
-     var $seekBars = $('.player-bar .seek-bar');
-
-     $seekBars.click(function(event) {
-         // #3
-         var offsetX = event.pageX - $(this).offset().left;
-         var barWidth = $(this).width();
-         // #4
-         var seekBarFillRatio = offsetX / barWidth;
-
-         // #5
-         updateSeekPercentage($(this), seekBarFillRatio);
-     });
-
-     // #7
-     $seekBars.find('.thumb').mousedown(function(event) {
-         // #8
-         var $seekBar = $(this).parent();
-
-         // #9
-         $(document).bind('mousemove.thumb', function(event){
-             var offsetX = event.pageX - $seekBar.offset().left;
-             var barWidth = $seekBar.width();
-             var seekBarFillRatio = offsetX / barWidth;
-
-             updateSeekPercentage($seekBar, seekBarFillRatio);
-         });
-
-         // #10
-         $(document).bind('mouseup.thumb', function() {
-             $(document).unbind('mousemove.thumb');
-             $(document).unbind('mouseup.thumb');
-         });
-     });
- };
-
- $seekBars.click(function(event) {
+    $seekBars.click(function (event) {
+        // #3
+        // pageX is a jQuery specific event value
+        // which holds the X (horizontal coordinate) at which the event occured
+        // subtract the offset () of the seek bar
+        // offset (): method for finding the distance between an element and the edge of the browser window
         var offsetX = event.pageX - $(this).offset().left;
         var barWidth = $(this).width();
+        // #4
+        // calculate seekBarFillRatio
         var seekBarFillRatio = offsetX / barWidth;
 
         if ($(this).parent().attr('class') == 'seek-control') {
@@ -257,15 +221,30 @@ var createSongRow = function(songNumber, songName, songLength) {
         } else {
             setVolume(seekBarFillRatio * 100);
         }
-
+        // #5
         updateSeekPercentage($(this), seekBarFillRatio);
     });
-
-    $seekBars.find('.thumb').mousedown(function(event) {
-
+    //  #7
+    // find elements with class of .thumb and add an event listener for the mousedown event
+    // mousedown event will fire as soon as the button is pressed down
+    // where as click event will fire after a button has been pressed AND released quickly
+    // mouseup event will fire when button is released
+    $seekBars.find('.thumb').mousedown(function (event) {
+        // #8
+        // $this = .thumb node
         var $seekBar = $(this).parent();
 
-        $(document).bind('mousemove.thumb', function(event){
+        // #9
+        // bind is similar to addEventListener () b/c it takes a string of an event
+        // bind allows a namespace event listener
+        // namespacing is a technique to make the event more specific by attaching a string to it after a period
+        // if we ever attach another event listener for the mousemove () event, the seek bar would only move if we inlcude the .thumb
+        // all jQuery event namespaces are offset with a period and followed by a string
+        // mousemove.thumb is identical to the click () behavior
+        // attached mousemove to $(document) to make sure we can drag the thumb after mousing down (even when the mouse leaves the seekbar)
+        // attaching it to $(document) allows us to continue to drag as long as the mouse remains down
+
+        $(document).bind('mousemove.thumb', function (event) {
             var offsetX = event.pageX - $seekBar.offset().left;
             var barWidth = $seekBar.width();
             var seekBarFillRatio = offsetX / barWidth;
@@ -279,6 +258,16 @@ var createSongRow = function(songNumber, songName, songLength) {
             updateSeekPercentage($seekBar, seekBarFillRatio);
         });
 
+        // #10
+        // bind the mouseup event with a .thumb namespace
+        // unbind () method removces the previous event listener that we just added
+        // if we fail to unbind, the thumb and fill would continue to move even after the usdr released the mouse
+        $(document).bind('mouseup.thumb', function () {
+            $(document).unbind('mousemove.thumb');
+            $(document).unbind('mouseup.thumb');
+        });
+    });
+};
 
 
  var trackIndex = function(album, song) {
@@ -353,19 +342,19 @@ var filterTimeCode = function (timeInSeconds) {
   };
 };
 
-  var togglePlayFromPlayerBar = function () {
-    var currentlyPlayingCell = getSongNumberCell(currentlyPlayingSongNumber);
+var togglePlayFromPlayerBar = function () {
+  var currentlyPlayingCell = getSongNumberCell(currentlyPlayingSongNumber);
 
-    if (currentSoundFile.isPaused()) {
-        $(currentlyPlayingCell).html(pauseButtonTemplate);
-        $('.main-controls .play-pause').html(playerBarPauseButton);
-        currentSoundFile.play();
-        updateSeekBarWhileSongPlays();
-    } else {
-        $(currentlyPlayingCell).html(playButtonTemplate);
-        $('.main-controls .play-pause').html(playerBarPlayButton);
-        currentSoundFile.pause();
-    }
+  if (currentSoundFile.isPaused()) {
+      $(currentlyPlayingCell).html(pauseButtonTemplate);
+      $('.main-controls .play-pause').html(playerBarPauseButton);
+      currentSoundFile.play();
+      updateSeekBarWhileSongPlays();
+  } else {
+      $(currentlyPlayingCell).html(playButtonTemplate);
+      $('.main-controls .play-pause').html(playerBarPlayButton);
+      currentSoundFile.pause();
+  }
 };
 
  // Album button templates
@@ -382,6 +371,7 @@ var filterTimeCode = function (timeInSeconds) {
  var currentVolume = 80;
  var $previousButton = $('.main-controls .previous');
  var $nextButton = $('.main-controls .next');
+ var $playPauseButton = $('.main-controls .play-pause');
 
  var updatePlayerBarSong = function() {
 
@@ -389,13 +379,11 @@ var filterTimeCode = function (timeInSeconds) {
     $('.currently-playing .artist-name').text(currentAlbum.artist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + " - " + currentAlbum.artist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
-
+};
     var setTotalTimeInPlayerBar = function (totalTime) {
     // var totalTime = currentSoundFile.getDuration();
     // $('.total-time').text(totalTime);
     $('.currently-playing .total-time').text(filterTimeCode(totalTime));
-};
-
 };
 
 $(document).ready(function () {
