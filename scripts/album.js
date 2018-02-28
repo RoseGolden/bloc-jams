@@ -1,3 +1,20 @@
+var setSong = function (songNumber) {
+   if (currentSoundFile) {
+        currentSoundFile.stop();
+    }
+
+    currentlyPlayingSongNumber = parseInt(songNumber);
+    currentSongFromAlbum = currentAlbum.songs[songNumber - 1];
+
+    // #1
+      currentSoundFile = new buzz.sound(currentSongFromAlbum.audioUrl, {
+          // #2
+          formats: [ 'mp3' ],
+          preload: true
+      });
+      setVolume(currentVolume);
+    };
+
 var seek = function(time) {
      if (currentSoundFile) {
          currentSoundFile.setTime(time);
@@ -5,43 +22,18 @@ var seek = function(time) {
  };
 
 var setVolume = function(volume) {
- if (currentSoundFile) {
-      currentSoundFile.setVolume(volume);
-  }
-  if (currentSoundFile) {
-      currentSoundFile.stop();
-  }
-};
-
- var setSong = function (songNumber) {
-   if (currentSoundFile) {
-        currentSoundFile.stop();
-    }
-   currentlyPlayingSongNumber = parseInt(songNumber);
-   currentSongFromAlbum = currentAlbum.songs[songNumber - 1];
-
-   // #1
-     currentSoundFile = new buzz.sound(currentSongFromAlbum.audioUrl, {
-         // #2
-         formats: [ 'mp3' ],
-         preload: true
-     });
-     setVolume(currentVolume);
-   };
-
-   var setVolume = function(volume) {
      if (currentSoundFile) {
-         currentSoundFile.setVolume(volume);
-     }
- };
-
-    // prevent concurrent play back
-    // stop current song before we set a new one
-
-
-  var getSongNumberCell = function (number) {
-    return $('.song-item-number[data-song-number="' + number + '"]');
+          currentSoundFile.setVolume(volume);
+      }
+      if (currentSoundFile) {
+          currentSoundFile.stop();
+  }
 };
+
+var getSongNumberCell = function (number) {
+  return $('.song-item-number[data-song-number="' + number + '"]');
+};
+
 // function takes songNumber, songName, songLength as arguments and populates
 // the song row template accordingly
 
@@ -57,9 +49,7 @@ var createSongRow = function(songNumber, songName, songLength) {
      '  <td class="song-item-duration">' + filterTimeCode(songLength) + '</td>' +
      '</tr>';
 
-     return $(template);
-
- var $row = $(template);
+var $row = $(template);
      var clickHandler = function () {
          var songNumber = parseInt($(this).attr('data-song-number'));
 
@@ -94,7 +84,6 @@ var createSongRow = function(songNumber, songName, songLength) {
                  currentSoundFile.pause();
              }
          }
-     };
 
      var onHover = function (event) {
          var songNumberCell = $(this).find('.song-item-number');
@@ -155,6 +144,30 @@ var createSongRow = function(songNumber, songName, songLength) {
      }
  };
 
+ // sets the text to current time in the song
+var setCurrentTimeInPlayerBar = function (currentTime) {
+    // var currentTime = currentSoundFile.getTime();
+    // $('.current-time').text(currentTime);
+    $('.current-time').text(filterTimeCode(currentTime));
+};
+
+var setTotalTimeInPlayerBar = function (totalTime) {
+// var totalTime = currentSoundFile.getDuration();
+// $('.total-time').text(totalTime);
+$('.currently-playing .total-time').text(filterTimeCode(totalTime));
+
+};
+
+var filterTimeCode = function (timeInSeconds) {
+  var minutes = Math.floor(timeInSeconds / 60);
+  var seconds = Math.floor(timeInSeconds % 60);
+  if (seconds < 10) {
+      return minutes + ":0" + seconds;;
+  } else {
+      return minutes + ":" + seconds;;
+  };
+};
+
  var updateSeekBarWhileSongPlays = function() {
       if (currentSoundFile) {
           // #10
@@ -178,26 +191,6 @@ var createSongRow = function(songNumber, songName, songLength) {
     var percentageString = offsetXPercent + '%';
     $seekBar.find('.fill').width(percentageString);
     $seekBar.find('.thumb').css({left: percentageString});
- };
-
-
- var updateSeekBarWhileSongPlays = function () {
-     if (currentSoundFile) {
-         // #10
-         // bind () the timeupdate event to currentSoundFile
-         // timeupdate is a custom Buzz event that fires repeatedly while time elapses during song playback
-         currentSoundFile.bind('timeupdate', function (event) {
-             // #11
-             // Buzz's getTime () method to get current time of the song
-             // Buzz's getDuration () method for getting the total length of the song
-             // both values return time in seconds
-             var seekBarFillRatio = this.getTime() / this.getDuration();
-             var $seekBar = $('.seek-control .seek-bar');
-
-             updateSeekPercentage($seekBar, seekBarFillRatio);
-             setCurrentTimeInPlayerBar(this.getTime());
-         });
-     }
  };
 
 
@@ -234,16 +227,6 @@ var createSongRow = function(songNumber, songName, songLength) {
         // $this = .thumb node
         var $seekBar = $(this).parent();
 
-        // #9
-        // bind is similar to addEventListener () b/c it takes a string of an event
-        // bind allows a namespace event listener
-        // namespacing is a technique to make the event more specific by attaching a string to it after a period
-        // if we ever attach another event listener for the mousemove () event, the seek bar would only move if we inlcude the .thumb
-        // all jQuery event namespaces are offset with a period and followed by a string
-        // mousemove.thumb is identical to the click () behavior
-        // attached mousemove to $(document) to make sure we can drag the thumb after mousing down (even when the mouse leaves the seekbar)
-        // attaching it to $(document) allows us to continue to drag as long as the mouse remains down
-
         $(document).bind('mousemove.thumb', function (event) {
             var offsetX = event.pageX - $seekBar.offset().left;
             var barWidth = $seekBar.width();
@@ -258,10 +241,6 @@ var createSongRow = function(songNumber, songName, songLength) {
             updateSeekPercentage($seekBar, seekBarFillRatio);
         });
 
-        // #10
-        // bind the mouseup event with a .thumb namespace
-        // unbind () method removces the previous event listener that we just added
-        // if we fail to unbind, the thumb and fill would continue to move even after the usdr released the mouse
         $(document).bind('mouseup.thumb', function () {
             $(document).unbind('mousemove.thumb');
             $(document).unbind('mouseup.thumb');
@@ -273,6 +252,37 @@ var createSongRow = function(songNumber, songName, songLength) {
  var trackIndex = function(album, song) {
      return album.songs.indexOf(song);
  };
+
+ var previousSong = function() {
+     var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);
+     // Note that we're _decrementing_ the index here
+     currentSongIndex--;
+
+     if (currentSongIndex < 0) {
+         currentSongIndex = currentAlbum.songs.length - 1;
+     }
+
+     // Save the last song number before changing it
+     var lastSongNumber = currentlyPlayingSongNumber;
+
+     // Set a new current song
+     setSong(currentSongIndex + 1);
+     currentSoundFile.play();
+     currentlyPlayingSongNumber = currentSongIndex + 1;
+     currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
+
+     // Update the Player Bar information
+     updatePlayerBarSong();
+
+     $('.main-controls .play-pause').html(playerBarPauseButton);
+
+     var $previousSongNumberCell = getSongNumberCell(currentlyPlayingSongNumber);
+     var $lastSongNumberCell = getSongNumberCell(lastSongNumber);
+
+     $previousSongNumberCell.html(pauseButtonTemplate);
+     $lastSongNumberCell.html(lastSongNumber);
+ };
+
 
  var nextSong = function() {
     var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);
@@ -302,45 +312,7 @@ var createSongRow = function(songNumber, songName, songLength) {
     $lastSongNumberCell.html(lastSongNumber);
 };
 
-var previousSong = function() {
-    var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);
-    // Note that we're _decrementing_ the index here
-    currentSongIndex--;
 
-    if (currentSongIndex < 0) {
-        currentSongIndex = currentAlbum.songs.length - 1;
-    }
-
-    // Save the last song number before changing it
-    var lastSongNumber = currentlyPlayingSongNumber;
-
-    // Set a new current song
-    setSong(currentSongIndex + 1);
-    currentSoundFile.play();
-    currentlyPlayingSongNumber = currentSongIndex + 1;
-    currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
-
-    // Update the Player Bar information
-    updatePlayerBarSong();
-
-    $('.main-controls .play-pause').html(playerBarPauseButton);
-
-    var $previousSongNumberCell = getSongNumberCell(currentlyPlayingSongNumber);
-    var $lastSongNumberCell = getSongNumberCell(lastSongNumber);
-
-    $previousSongNumberCell.html(pauseButtonTemplate);
-    $lastSongNumberCell.html(lastSongNumber);
-};
-
-var filterTimeCode = function (timeInSeconds) {
-  var minutes = Math.floor(timeInSeconds / 60);
-  var seconds = Math.floor(timeInSeconds % 60);
-  if (seconds < 10) {
-      return minutes + ":0" + seconds;;
-  } else {
-      return minutes + ":" + seconds;;
-  };
-};
 
 var togglePlayFromPlayerBar = function () {
   var currentlyPlayingCell = getSongNumberCell(currentlyPlayingSongNumber);
@@ -379,11 +351,6 @@ var togglePlayFromPlayerBar = function () {
     $('.currently-playing .artist-name').text(currentAlbum.artist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + " - " + currentAlbum.artist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
-};
-    var setTotalTimeInPlayerBar = function (totalTime) {
-    // var totalTime = currentSoundFile.getDuration();
-    // $('.total-time').text(totalTime);
-    $('.currently-playing .total-time').text(filterTimeCode(totalTime));
 };
 
 $(document).ready(function () {
