@@ -83,7 +83,7 @@ var $row = $(template);
                  $('.main-controls .play-pause').html(playerBarPlayButton);
                  currentSoundFile.pause();
              }
-         }
+         };
 
      var onHover = function (event) {
          var songNumberCell = $(this).find('.song-item-number');
@@ -100,7 +100,7 @@ var $row = $(template);
          if (parseInt(songNumber) !== currentlyPlayingSongNumber) {
              songNumberCell.html(parseInt(songNumber));
          }
-     };
+     }
 
      // #1
      // find() is similar to to querySelector()
@@ -143,6 +143,7 @@ var $row = $(template);
        $albumSongList.append($newRow);
      }
  };
+};
 
  // sets the text to current time in the song
 var setCurrentTimeInPlayerBar = function (currentTime) {
@@ -222,7 +223,7 @@ var filterTimeCode = function (timeInSeconds) {
     // mousedown event will fire as soon as the button is pressed down
     // where as click event will fire after a button has been pressed AND released quickly
     // mouseup event will fire when button is released
-    $seekBars.find('.thumb').mousedown(function (event) {
+        $seekBars.find('.thumb').mousedown(function (event) {
         // #8
         // $this = .thumb node
         var $seekBar = $(this).parent();
