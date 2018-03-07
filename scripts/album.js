@@ -141,7 +141,8 @@ if (parseInt(songNumber) !== currentlyPlayingSongNumber) {
 };
 
  // sets the text to current time in the song
-var setCurrentTimeInPlayerBar = function (currentTime) {
+
+ var setCurrentTimeInPlayerBar = function (currentTime) {
     // var currentTime = currentSoundFile.getTime();
     // $('.current-time').text(currentTime);
     $('.current-time').text(filterTimeCode(currentTime));
@@ -154,15 +155,13 @@ $('.currently-playing .total-time').text(filterTimeCode(totalTime));
 
 };
 
+//FIX THIS SHIT!!!
 var filterTimeCode = function (timeInSeconds) {
-  var minutes = Math.floor(timeInSeconds / 60);
-  var seconds = Math.floor(timeInSeconds % 60);
-  if (seconds < 10) {
-      return minutes + ":0" + seconds;;
-  } else {
-      return minutes + ":" + seconds;;
-  };
+  parseFloat(timeInSeconds)
+
+
 };
+// FIX THIS SHIT TODAY!!!
 
  var updateSeekBarWhileSongPlays = function() {
       if (currentSoundFile) {
@@ -173,6 +172,8 @@ var filterTimeCode = function (timeInSeconds) {
               var $seekBar = $('.seek-control .seek-bar');
 
               updateSeekPercentage($seekBar, seekBarFillRatio);
+              setCurrentTimeInPlayerBar(this.getTime());
+
           });
       }
   };
@@ -347,6 +348,8 @@ var togglePlayFromPlayerBar = function () {
     $('.currently-playing .artist-name').text(currentAlbum.artist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + " - " + currentAlbum.artist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
+    setTotalTimeInPlayerBar(currentSongFromAlbum.duration);
+
 };
 
 $(document).ready(function () {
